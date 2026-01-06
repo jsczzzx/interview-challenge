@@ -106,8 +106,17 @@ export class PaymentElementComponent {
       securityCode: cardData.securityCode,
       postalCode: cardData.postalCode
     }
-    this.tokenService.getToken(normalizedCardData).subscribe(token=>{
-      this.paymentToken.emit(token);
+    this.tokenService.getToken(normalizedCardData).subscribe(res=>{
+      //this.paymentToken.emit(token);
+      const token = res.token;
+
+      window.parent.postMessage(
+        {
+          type: 'paymentToken',
+          token: token
+        },
+        '*'
+      );
     })
 
   }

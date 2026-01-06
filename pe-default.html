@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script type="module" src="./payment-element/dist/payment-element/browser/polyfills.js"></script>
-    <script type="module" src="./payment-element/dist/payment-element/browser/main.js"></script>
+    <title>Host App</title>
+    <style>
+      iframe {
+        width: 100%;
+        max-width: 420px;
+        height: 420px;
+        border: none;
+      }
+    </style>
   </head>
   <body>
 
-    <h1>Payment Element Default</h1>
+    <h1>Checkout</h1>
 
-    <payment-element id="pay"></payment-element>
+    <iframe
+      id="paymentFrame"
+      src="http://localhost:4200"
+    ></iframe>
 
     <script>
-      const el = document.getElementById('pay');
+      window.addEventListener('message', async (event) => {
+        if (event.data?.type !== 'paymentToken') return;
 
-      el.addEventListener('paymentToken', async (e) => {
-        const token = e.detail;
-        alert('test: '+JSON.stringify(token));
+        const token = event.data.token;
+        console.log('Host received token:', token);
 
         try {
           const res = await fetch('http://localhost:3000/pay', {
@@ -23,26 +33,23 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               token: token,
-              amount: 250
+              amount: 945
             })
           });
 
-          if (!res.ok) {
-            throw new Error('HTTP error ' + res.status);
+          const result = await res.json();
+
+          if (result.success) {
+            alert('Payment successful! Transaction: ' + result.transactionId);
+          } else {
+            alert('Payment failed: ' + result.message);
           }
 
-          const result = await res.json();
-          console.log('Payment API result:', result);
-
-          // json-server always returns created object → treat as success
-          alert('Payment successful! Transaction ID: ' + result.id);
-
         } catch (err) {
-          console.error('Payment error:', err);
-          alert('Payment failed');
+          console.error(err);
+          alert('Network error');
         }
       });
-
     </script>
 
   </body>
