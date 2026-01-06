@@ -15,10 +15,10 @@ export class PaymentElementComponent {
 
   ngOnInit() {
     this.paymentForm = this.fb.group({
-      cardNumber: ['', [Validators.required]],
-      expirationDate: ['', [Validators.required]],
-      securityCode: ['', Validators.required],
-      postalCode: ['', Validators.required]
+      cardNumber: ['', [Validators.required, Validators.minLength(19)]],
+      expirationDate: ['', [Validators.required, Validators.minLength(7)]],
+      securityCode: ['', [Validators.required, Validators.minLength(3)]],
+      postalCode: ['', [Validators.required, Validators.minLength(5)]]
     })
 
   this.paymentForm.get('cardNumber')?.valueChanges.subscribe(val => {
@@ -44,7 +44,7 @@ export class PaymentElementComponent {
         
         const formatted = digitsOnly
           .match(/.{1,2}/g)
-          ?.join('/') || '';
+          ?.join(' / ') || '';
         
         if (formatted !== val) {
           this.paymentForm.get('expirationDate')?.setValue(formatted, { emitEvent: false });

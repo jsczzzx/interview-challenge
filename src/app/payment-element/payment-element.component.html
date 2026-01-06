@@ -1,4 +1,5 @@
 <form [formGroup]="paymentForm">
+    <h2>Card</h2>
     <div class="form-row">
         <div class="form-group">
             <label for="card-number">Card number</label>
@@ -8,6 +9,14 @@
                 placeholder="1234 1234 1234 1234"
                 maxlength="19"
             >
+            @if (paymentForm.get("cardNumber")?.touched) {
+                @if (paymentForm.get("cardNumber")?.hasError("required")) {
+                    <small class="alert">Card number is required!</small>
+                }
+                @if (paymentForm.get("cardNumber")?.hasError("minlength")) {
+                    <small class="alert">Card number is incomplete!</small>
+                }
+            }
         </div>
     </div>
     <div class="form-row">
@@ -17,9 +26,17 @@
                 id="expiration-date" 
                 formControlName="expirationDate" 
                 type="text"
-                maxlength="5"
-                placeholder="MM/YY"
+                maxlength="7"
+                placeholder="MM / YY"
             >
+            @if (paymentForm.get("expirationDate")?.touched) {
+                @if (paymentForm.get("expirationDate")?.hasError("required")) {
+                    <small class="alert">Expiration date is required!</small>
+                }
+                @if (paymentForm.get("expirationDate")?.hasError("minlength")) {
+                    <small class="alert">Expiration date is incomplete!</small>
+                }
+            }  
         </div>
         <div class="form-group">
             <label for="security-code">Security code</label>
@@ -30,6 +47,14 @@
                 maxlength="3"
                 placeholder="CVC"
             >
+            @if (paymentForm.get("securityCode")?.touched) {
+                @if (paymentForm.get("securityCode")?.hasError("required")) {
+                    <small class="alert">Security code is required!</small>
+                }
+                @if (paymentForm.get("securityCode")?.hasError("minlength")) {
+                    <small class="alert">Security code is incomplete!</small>
+                }
+            }  
         </div>
     </div>
 
@@ -43,6 +68,14 @@
                 maxlength="5"
                 placeholder="12345"
             >
+            @if (paymentForm.get("postalCode")?.touched) {
+                @if (paymentForm.get("postalCode")?.hasError("required")) {
+                    <small class="alert">Postal code is required!</small>
+                }
+                @if (paymentForm.get("postalCode")?.hasError("minlength")) {
+                    <small class="alert">Postal code is incomplete!</small>
+                }
+            }  
         </div>
     </div>    
 
