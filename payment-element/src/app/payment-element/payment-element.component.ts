@@ -9,7 +9,7 @@ import { TokenService } from '../services/token.service';
   standalone: true,
   templateUrl: './payment-element.component.html',
   styleUrl: './payment-element.component.scss',
-  encapsulation: ViewEncapsulation.ShadowDom
+  // encapsulation: ViewEncapsulation.ShadowDom
 })
 export class PaymentElementComponent {
 

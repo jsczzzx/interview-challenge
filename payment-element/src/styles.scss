@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --pe-color-primary: blue;
+  --pe-color-border: #d1d5db;
+  --pe-color-bg: white;
+  --pe-color-text: black;
+  --pe-color-focus: #4f46e5;
+  --pe-color-error: red;
+
+  --pe-radius: 6px;
+  --pe-font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  --pe-font-size: 16px;
+}
