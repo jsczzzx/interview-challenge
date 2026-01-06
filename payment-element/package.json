@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build:elements": "ng build --configuration=production --output-hashing=none && npm run package:elements",
+    "build:elements": "ng build --configuration=production && npm run package:elements",
     "package:elements": "cat dist/payment-element/browser/polyfills*.js dist/payment-element/browser/main*.js > dist/payment-form.js"
   },
   "private": true,
@@ -20,6 +20,7 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@webcomponents/custom-elements": "^1.6.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
