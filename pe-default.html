@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Host App - Payment Challenge Integration</title>
+    <title>Host Application - Payment Component Integration</title>
     <style>
       body { 
         font-family: sans-serif; 
@@ -11,11 +11,8 @@
       }
       iframe {
         width: 100%;
-        max-width: 600px; /* 更新后的最大宽度 */
-        height: 600px;  /* 更新后的高度 */
-        border: 1px solid #ccc; /* 添加边框以区分 */
-        border-radius: 8px;
-        display: block;
+        max-width: 600px;
+        height: 400px;
         margin-bottom: 20px;
       }
       #status {
@@ -33,32 +30,28 @@
   </head>
   <body>
 
-    <h1>Checkout - 订单金额 $100.00</h1>
-    <p>请在下方 iFrame 中输入支付信息并提交。敏感信息将直接流向令牌化服务。</p>
+    <h1>Checkout - Order Total $100.00</h1>
+    <p>Please enter payment information in the iFrame below. Sensitive data is securely tokenized.</p>
 
     <iframe
       id="paymentFrame"
       src="http://localhost:4200"
     ></iframe>
 
-    <div id="status" class="initial">等待支付组件发送安全令牌...</div>
+    <div id="status" class="initial">Awaiting secure token from payment component...</div>
     <div id="tokenOutput" class="token-info"></div>
-    <h3>支付 API 响应:</h3>
-    <pre id="responseOutput" class="response-output">等待交易完成...</pre>
+    <h3>Payment API Response:</h3>
+    <pre id="responseOutput" class="response-output">Awaiting transaction completion...</pre>
 
     <script>
       const statusDiv = document.getElementById('status');
       const tokenOutputDiv = document.getElementById('tokenOutput');
       const responseOutputDiv = document.getElementById('responseOutput');
 
-      // 虚拟 API 支付端点 (假设您的 JSON Server 运行在 3000 端口)
       const PAY_API_URL = 'http://localhost:3000/api/v1/pay';
-      // iFrame 的源，用于安全验证
       const IFRAME_ORIGIN = 'http://localhost:4200'; 
       
-      // 1. 监听来自 iFrame 的消息 (安全令牌)
       window.addEventListener('message', (event) => {
-        // **安全检查:** 严格验证消息的来源 (Source Origin)
         if (event.origin !== IFRAME_ORIGIN) {
           console.warn('Received message from unknown origin:', event.origin);
           return; 
@@ -66,31 +59,24 @@
 
         const data = event.data;
 
-        // 检查消息类型是否为我们期望的 'paymentToken'
         if (data.type === 'paymentToken' && data.token) {
           const paymentToken = data.token;
           
           statusDiv.className = 'initial';
-          statusDiv.textContent = '✅ 接收到安全令牌，正在调用支付 API...';
-          tokenOutputDiv.textContent = `令牌 (Token): ${paymentToken}`;
+          statusDiv.textContent = 'Received secure token. Calling Payment API...';
+          tokenOutputDiv.textContent = `Token: ${paymentToken}`;
 
-          // 2. 接收到令牌后，调用虚拟的支付处理 API
           handlePayment(paymentToken);
         }
         
-        // 可选：监听 iFrame 中的验证或加载状态
         if (data.type === 'validationError' && data.message) {
             statusDiv.className = 'failure';
-            statusDiv.textContent = `🚨 组件验证错误: ${data.message}`;
+            statusDiv.textContent = `Component Validation Error: ${data.message}`;
         }
       });
 
-      /**
-       * 模拟宿主应用后端使用令牌进行支付
-       * @param {string} token - 从 iFrame 接收的安全支付令牌
-       */
       async function handlePayment(token) {
-        responseOutputDiv.textContent = '正在发送支付请求...';
+        responseOutputDiv.textContent = 'Sending payment request...';
         try {
           const response = await fetch(PAY_API_URL, {
             method: 'POST',
@@ -99,34 +85,31 @@
             },
             body: JSON.stringify({
               token: token,
-              // 模拟发送其他支付所需的数据
               amount: 1000,
               postalCode: '90210' 
             })
           });
 
-          // 检查响应状态
           const result = await response.json();
           responseOutputDiv.textContent = JSON.stringify(result, null, 2);
 
           if (response.ok && result.success) {
             statusDiv.className = 'success';
-            statusDiv.textContent = `🎉 支付成功！交易ID: ${result.transactionId}`;
+            statusDiv.textContent = `Payment Successful! Transaction ID: ${result.transactionId}`;
           } else {
             statusDiv.className = 'failure';
-            // 即使 HTTP 状态码不是 200，也使用 API 返回的错误信息
-            statusDiv.textContent = `❌ 支付失败: ${result.message || '交易未完成'}`;
+            statusDiv.textContent = `Payment Failed: ${result.message || 'Transaction not completed'}`;
           }
 
         } catch (error) {
           statusDiv.className = 'failure';
-          statusDiv.textContent = `🚨 支付请求失败 (网络错误): ${error.message}`;
-          responseOutputDiv.textContent = `错误: ${error.message}`;
+          statusDiv.textContent = `Payment Request Failed (Network Error): ${error.message}`;
+          responseOutputDiv.textContent = `Error: ${error.message}`;
           console.error('Payment API Call Failed:', error);
         }
       }
 
-      console.log("宿主应用已启动，正在监听 iFrame 消息...");
+      console.log("Host application initialized and listening for iFrame messages.");
 
     </script>
 
