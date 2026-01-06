@@ -36,6 +36,12 @@
                 @if (paymentForm.get("expirationDate")?.hasError("minlength")) {
                     <small class="alert">Expiration date is incomplete!</small>
                 }
+                @if (paymentForm.get("expirationDate")?.hasError("invalidMonth")) {
+                    <small class="alert">Expiration format is invalid!</small>
+                }
+                @if (paymentForm.get("expirationDate")?.hasError("expired")) {
+                    <small class="alert">Your card is expired!</small>
+                }
             }  
         </div>
         <div class="form-group">
