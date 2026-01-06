@@ -12,7 +12,7 @@ export class TokenService {
 
   getToken(normalizedCardData: NormalizedCardData): Observable<any> {
     return this.http.post<{ token: string }>(
-      'http://localhost:3000/tokenize', normalizedCardData
+      'http://localhost:3000/api/v1/tokenize', normalizedCardData
     )
   }
 
