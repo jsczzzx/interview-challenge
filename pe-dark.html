@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="module" src="./payment-element/dist/payment-element/browser/polyfills.js"></script> 
+    <script type="module" src="./payment-element/dist/payment-element/browser/main.js"></script> 
+  </head>
+  <body>
+    <h1>Payment Element Dark Style</h1>
+    <payment-element class="dark"></payment-element>
+
+    <style>
+      payment-element.dark {
+        --pe-color-primary: #0ea5e9;
+        --pe-color-bg: #020617;
+        --pe-color-text: #e5e7eb;
+        --pe-color-border: #1e293b;
+        --pe-color-focus: #38bdf8;
+        --pe-color-error: #f87171;
+
+        --pe-radius: 8px;
+        --pe-font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      }
+    </style>
+  </body>
+</html>
