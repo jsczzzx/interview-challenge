@@ -1,26 +1,11 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <title>Payment Component Frame</title>
-    </head>
-  <body >
+    <meta charset="utf-8">
+    <title>Payment Frame</title>
+    <base href="/">
+  </head>
+  <body>
     <app-root></app-root>
-
-    <script>
-      window.addEventListener('message', (event) => {
-        const data = event.data;
-
-        if (data && data.type === 'setTheme' && data.variables) {
-          const rootElement = document.documentElement;
-
-          for (const [variableName, value] of Object.entries(data.variables)) {
-            rootElement.style.setProperty(variableName, value);
-            console.log(`Applied CSS Variable: ${variableName} = ${value}`);
-          }
-        }
-      });
-      
-    </script>
   </body>
 </html>

@@ -21,6 +21,9 @@ export class PaymentElementComponent {
   constructor(private fb: FormBuilder, private tokenService: TokenService){}
 
   ngOnInit() {
+
+
+    
     this.paymentForm = this.fb.group({
       cardNumber: ['', [Validators.required, Validators.minLength(19)]],
       expirationDate: ['', [Validators.required, Validators.minLength(7), this.expirationDateValidator()]],
