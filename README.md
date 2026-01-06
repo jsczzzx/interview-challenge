@@ -6,6 +6,12 @@ The goal is to simulate how modern payment systems (e.g. Stripe Elements, Adyen 
 
 This is intentionally not built as a traditional Angular SPA. The payment UI is treated as an isolated, embeddable component.
 
+<img width="1430" height="1288" alt="ScreenShot_2026-01-06_161130_687" src="https://github.com/user-attachments/assets/6f68a34c-abc1-4e99-9056-9bfbf5a80e99" />
+<img width="1192" height="784" alt="ScreenShot_2026-01-06_161234_329" src="https://github.com/user-attachments/assets/81af9ce2-1864-4cef-90d8-fc2d4250c515" />
+<img width="1524" height="1582" alt="ScreenShot_2026-01-06_161308_371" src="https://github.com/user-attachments/assets/2192ca29-62ba-42f4-857c-32f36a19b0da" />
+<img width="1506" height="1584" alt="ScreenShot_2026-01-06_161321_251" src="https://github.com/user-attachments/assets/09449459-a858-4da0-a940-6eb52ca6f472" />
+
+
 ---
 
 ## Project Structure
