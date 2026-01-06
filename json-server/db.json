@@ -1,0 +1,16 @@
+{
+  "tokenize": [
+    {
+      "id": 1,
+      "token": "tok_demo_123456",
+      "expiresIn": 60
+    }
+  ],
+  "pay": [
+    {
+      "id": 1,
+      "status": "success",
+      "transactionId": "txn_demo_abc123"
+    }
+  ]
+}
