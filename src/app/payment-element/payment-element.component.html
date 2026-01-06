@@ -2,24 +2,47 @@
     <div class="form-row">
         <div class="form-group">
             <label for="card-number">Card number</label>
-            <input id="card-number" formControlName="cardNumber" placeholder="1234 1234 1234 1234">
+            <input 
+                id="card-number" 
+                formControlName="cardNumber" 
+                placeholder="1234 1234 1234 1234"
+                maxlength="19"
+            >
         </div>
     </div>
     <div class="form-row">
         <div class="form-group">
             <label for="expiration-date">Expiration date</label>
-            <input id="expiration-date" formControlName="expirationDate" placeholder="MM/YY">
+            <input 
+                id="expiration-date" 
+                formControlName="expirationDate" 
+                type="text"
+                maxlength="5"
+                placeholder="MM/YY"
+            >
         </div>
         <div class="form-group">
             <label for="security-code">Security code</label>
-            <input id="security-code" formControlName="securityCode" placeholder="CVC">
+            <input 
+                id="security-code" 
+                formControlName="securityCode" 
+                type="text"
+                maxlength="3"
+                placeholder="CVC"
+            >
         </div>
     </div>
 
     <div class="form-row">
         <div class="form-group">
             <label for="postal-code">Postal code</label>
-            <input id="postal-code" formControlName="postalCode" placeholder="12345">
+            <input 
+                id="postal-code" 
+                formControlName="postalCode" 
+                type="text"
+                maxlength="5"
+                placeholder="12345"
+            >
         </div>
     </div>    
 
