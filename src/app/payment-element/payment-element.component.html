@@ -8,6 +8,7 @@
                 formControlName="cardNumber" 
                 placeholder="1234 1234 1234 1234"
                 maxlength="19"
+                [style.border-color]="(paymentForm.get('cardNumber')?.touched && !paymentForm.get('cardNumber')?.valid) ? 'red' : null "
             >
             @if (paymentForm.get("cardNumber")?.touched) {
                 @if (paymentForm.get("cardNumber")?.hasError("required")) {
@@ -28,6 +29,7 @@
                 type="text"
                 maxlength="7"
                 placeholder="MM / YY"
+                [style.border-color]="(paymentForm.get('expirationDate')?.touched && !paymentForm.get('expirationDate')?.valid) ? 'red' : null "
             >
             @if (paymentForm.get("expirationDate")?.touched) {
                 @if (paymentForm.get("expirationDate")?.hasError("required")) {
@@ -52,6 +54,7 @@
                 type="text"
                 maxlength="3"
                 placeholder="CVC"
+                [style.border-color]="(paymentForm.get('securityCode')?.touched && !paymentForm.get('securityCode')?.valid) ? 'red' : null "
             >
             @if (paymentForm.get("securityCode")?.touched) {
                 @if (paymentForm.get("securityCode")?.hasError("required")) {
@@ -73,6 +76,7 @@
                 type="text"
                 maxlength="5"
                 placeholder="12345"
+                [style.border-color]="(paymentForm.get('postalCode')?.touched && !paymentForm.get('postalCode')?.valid) ? 'red' : null "
             >
             @if (paymentForm.get("postalCode")?.touched) {
                 @if (paymentForm.get("postalCode")?.hasError("required")) {
@@ -84,5 +88,6 @@
             }  
         </div>
     </div>    
+    <button class="btn-primary" [disabled]="!paymentForm.valid">Place Your Order</button>
 
 </form>
