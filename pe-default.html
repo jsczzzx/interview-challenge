@@ -6,7 +6,7 @@
   </head>
   <body>
 
-    <h1>Plain HTML Host</h1>
+    <h1>Payment Element Default</h1>
 
     <payment-element id="pay"></payment-element>
 
@@ -15,6 +15,7 @@
 
       el.addEventListener('paymentToken', async (e) => {
         const token = e.detail;
+        alert('test: '+JSON.stringify(token));
 
         try {
           const res = await fetch('http://localhost:3000/pay', {
