@@ -159,18 +159,24 @@ http://localhost:4200
 
 ---
 
-### 3. Open host pages
+### 3. Start host server and open demo pages
 
-Open in browser:
+The host pages **must be served via HTTP**. Do **not** open them using `file://`.
+
+From the project root:
+
+```bash
+npx http-server .
+```
+
+Then open in browser:
 
 ```
-pe-default.html
-pe-dark.html
+http://localhost:8080/pe-default.html
+http://localhost:8080/pe-dark.html
 ```
 
-These demonstrate:
-- Default theme
-- Dark theme via postMessage tokens
+Note: Using `file://` will break iframe isolation and `postMessage` behavior.
 
 ---
 
