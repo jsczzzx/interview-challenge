@@ -1,59 +1,208 @@
-# PaymentElement
+# Secure Payment Element (Angular + iframe)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.19.
+This project demonstrates a secure payment element architecture using **Angular inside an iframe**, a **mock backend (json-server)**, and **design-token based theming via postMessage**.
 
-## Development server
+The goal is to simulate how modern payment systems (e.g. Stripe Elements, Adyen Drop-in) isolate sensitive card data while still allowing host applications to control styling and handle payment flow.
 
-To start a local development server, run:
+This is intentionally not built as a traditional Angular SPA. The payment UI is treated as an isolated, embeddable component.
 
-```bash
-ng serve
+---
+
+## Project Structure
+
+```
+.
+├── json-server/          # Mock backend (tokenize + pay)
+├── payment-element/      # Angular app (iframe content)
+├── pe-default.html       # Host demo page (default theme)
+├── pe-dark.html          # Host demo page (dark theme)
+└── README.md
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Architecture Overview
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+The project is split into three clearly separated parts:
 
-```bash
-ng generate component component-name
+### 1. payment-element (Angular – iframe content)
+
+Responsibilities:
+- Render payment form UI
+- Handle input formatting (card number, expiry, CVC, postal code)
+- Validate user input
+- Normalize card data
+- Call `/api/v1/tokenize`
+- Send token to host via `window.parent.postMessage`
+
+Key points:
+- The Angular app never handles payment processing directly
+- It only produces a token
+- It has no knowledge of order amount or business logic
+
+This mirrors how real payment elements work: collect + tokenize only.
+
+---
+
+### 2. Host pages (pe-default.html / pe-dark.html)
+
+Responsibilities:
+- Load the payment element via iframe
+- Send theme tokens to iframe via `postMessage`
+- Receive payment token from iframe
+- Call `/api/v1/pay`
+- Display payment result
+
+The host page never sees raw card data. It only deals with tokens.
+
+This separation is intentional and is the core security model.
+
+---
+
+### 3. json-server (mock backend)
+
+Endpoints:
+- `POST /api/v1/tokenize`  
+  Simulates token generation from card data
+
+- `POST /api/v1/pay`  
+  Simulates payment processing using token
+
+This backend is only for demo purposes. No real payment logic exists.
+
+---
+
+## Data Flow
+
+```
+User types card data
+        ↓
+[ Angular payment-element (iframe) ]
+        ↓  POST /api/v1/tokenize
+[ json-server ]
+        ↓  returns token
+[ Angular iframe ]
+        ↓  postMessage(token)
+[ Host page ]
+        ↓  POST /api/v1/pay
+[ json-server ]
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+At no point does raw card data leave the iframe context.
 
-```bash
-ng generate --help
+---
+
+## Theming Model
+
+The host controls styling by sending CSS variables:
+
+```js
+paymentFrame.contentWindow.postMessage({
+  type: 'setTheme',
+  variables: {
+    '--pe-color-bg': '#020617',
+    '--pe-color-text': '#e5e7eb',
+    '--pe-color-border': '#1e293b',
+    '--pe-color-primary': '#38bdf8'
+  }
+}, '*');
 ```
 
-## Building
+Inside Angular, styles are defined using these tokens:
 
-To build the project run:
-
-```bash
-ng build
+```scss
+form {
+  background-color: var(--pe-color-bg);
+  color: var(--pe-color-text);
+  border: 1px solid var(--pe-color-border);
+}
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+This allows:
+- Dark / light theme switching
+- Brand customization
+- Zero coupling between host and iframe styles
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## How to Run
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### 1. Start mock backend
 
 ```bash
-ng e2e
+cd json-server
+npm install
+node index.js
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Server will run on:
 
-## Additional Resources
+```
+http://localhost:3000
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+
+### 2. Start Angular payment element
+
+```bash
+cd payment-element
+npm install
+npm start
+```
+
+Angular app will run on:
+
+```
+http://localhost:4200
+```
+
+---
+
+### 3. Start host server and open demo pages
+
+The host pages **must be served via HTTP**. Do **not** open them using `file://`.
+
+From the project root:
+
+```bash
+npx http-server .
+```
+
+Then open in browser:
+
+```
+http://localhost:8080/pe-default.html
+http://localhost:8080/pe-dark.html
+```
+
+Note: Using `file://` will break iframe isolation and `postMessage` behavior.
+
+---
+
+## Why iframe (and not Web Components)
+
+This is a deliberate design decision.
+
+iframe provides:
+- Full DOM isolation
+- No CSS leakage
+- No JS context sharing
+- Strong security boundary
+
+For payment use cases, this is closer to real-world production systems than using Shadow DOM alone.
+
+---
+
+## Notes
+
+- This project focuses on architecture and data flow, not visual design
+- The backend is mocked
+- No real payment provider is used
+- The goal is to demonstrate correct separation of concerns and security boundaries
+
+---
+
+## License
+
+For demonstration and evaluation purposes only.
