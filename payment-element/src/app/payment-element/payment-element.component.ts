@@ -1,14 +1,15 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NormalizedCardData } from '../data.model';
 import { TokenService } from '../services/token.service';
 
 @Component({
-  selector: 'app-payment-element',
+  selector: 'payment-element',
   imports: [ReactiveFormsModule],
   standalone: true,
   templateUrl: './payment-element.component.html',
-  styleUrl: './payment-element.component.scss'
+  styleUrl: './payment-element.component.scss',
+  encapsulation: ViewEncapsulation.ShadowDom
 })
 export class PaymentElementComponent {
 

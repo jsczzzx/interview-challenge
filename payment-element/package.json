@@ -6,13 +6,16 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:elements": "ng build --configuration=production --output-hashing=none && npm run package:elements",
+    "package:elements": "cat dist/payment-element/browser/polyfills*.js dist/payment-element/browser/main*.js > dist/payment-form.js"
   },
   "private": true,
   "dependencies": {
     "@angular/common": "^19.2.0",
     "@angular/compiler": "^19.2.0",
     "@angular/core": "^19.2.0",
+    "@angular/elements": "^19.2.17",
     "@angular/forms": "^19.2.0",
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",

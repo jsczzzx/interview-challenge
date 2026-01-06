@@ -12,7 +12,13 @@ export class TokenService {
 
   getToken(normalizedCardData: NormalizedCardData): Observable<any> {
     return this.http.post<{ token: string }>(
-      'google.com', normalizedCardData
+      'localhost:3000/tokenize', normalizedCardData
     )
   }
+
+  // makePayment(token: string, amount: number): Observable<any> {
+  //   return this.http.post<{ status: string, transactionId: string}>(
+  //     'localhost:3000/pay', { token, amount: amount}
+  //   )
+  // }
 }
