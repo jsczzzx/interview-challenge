@@ -32,7 +32,6 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -55,7 +54,8 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": false,
+              "namedChunks": false
             }
           },
           "defaultConfiguration": "production"
