@@ -90,4 +90,6 @@ export class PaymentElementComponent {
     }
   }
 
+  submit() {}
+
 }
