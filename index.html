@@ -46,7 +46,6 @@
       if (!event.data?.type) return;
 
       if (event.data.type === 'REQUEST_SUBMIT') {
-        // 关键修复点：不再调用 el.submit()
         el.dispatchEvent(new CustomEvent('requestSubmit'));
       }
 
