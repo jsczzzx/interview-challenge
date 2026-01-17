@@ -1,118 +1,117 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Host Application - Payment Component Integration</title>
-    <style>
-      body { 
-        font-family: sans-serif; 
-        padding: 20px; 
-        max-width: 800px;
-        margin: 0 auto; 
-      }
-      iframe {
-        width: 100%;
-        max-width: 600px;
-        height: 500px;
-        margin-bottom: 20px;
-        background-color: whitesmoke;
-      }
-      #status {
-        padding: 15px;
-        border-radius: 4px;
-        font-weight: bold;
-        transition: all 0.3s ease;
-      }
-      .initial { background-color: #f0f0f0; color: #333; }
-      .success { background-color: #e6ffe6; color: green; border: 1px solid green; }
-      .failure { background-color: #ffe6e6; color: red; border: 1px solid red; }
-      .token-info { margin-top: 10px; font-size: small; color: #555; }
-      .response-output { white-space: pre-wrap; background-color: #f7f7f7; padding: 10px; border-radius: 4px; }
-    </style>
-  </head>
-  <body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout Page (Default)</title>
 
-    <h1>Checkout - Order Total $100.00</h1>
-    <p>Please enter payment information in the iFrame below. Sensitive data is securely tokenized.</p>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 24px;
+      background: #f9fafb;
+    }
 
-    <iframe
-      id="paymentFrame"
-      src="http://localhost:4200"
-    ></iframe>
+    iframe {
+      width: 100%;
+      max-width: 720px;
+      height: 560px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
 
-    <div id="status" class="initial">Awaiting secure token from payment component...</div>
-    <div id="tokenOutput" class="token-info"></div>
-    <h3>Payment API Response:</h3>
-    <pre id="responseOutput" class="response-output">Awaiting transaction completion...</pre>
+    .panel {
+      max-width: 720px;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
 
-    <script>
-      const statusDiv = document.getElementById('status');
-      const tokenOutputDiv = document.getElementById('tokenOutput');
-      const responseOutputDiv = document.getElementById('responseOutput');
+    .panel.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
 
-      const PAY_API_URL = 'http://localhost:3000/api/v1/pay';
-      const IFRAME_ORIGIN = 'http://localhost:4200'; 
-      
-      window.addEventListener('message', (event) => {
-        if (event.origin !== IFRAME_ORIGIN) {
-          console.warn('Received message from unknown origin:', event.origin);
-          return; 
-        }
+    .panel.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+  </style>
+</head>
+<body>
 
-        const data = event.data;
+  <h1>Checkout Page (Default)</h1>
 
-        if (data.type === 'paymentToken' && data.token) {
-          const paymentToken = data.token;
-          
-          statusDiv.className = 'initial';
-          statusDiv.textContent = 'Received secure token. Calling Payment API...';
-          tokenOutputDiv.textContent = `Token: ${paymentToken}`;
+  <iframe
+    id="payment-frame"
+    src="http://localhost:8080/index.html"
+    sandbox="allow-scripts allow-same-origin"
+  ></iframe>
 
-          handlePayment(paymentToken);
-        }
-        
-        if (data.type === 'validationError' && data.message) {
-            statusDiv.className = 'failure';
-            statusDiv.textContent = `Component Validation Error: ${data.message}`;
-        }
-      });
+  <div id="token-panel">
+    Waiting for token…
+  </div>
 
-      async function handlePayment(token) {
-        responseOutputDiv.textContent = 'Sending payment request...';
+  <div id="result-panel"></div>
+
+  <script>
+    const tokenPanel = document.getElementById('token-panel');
+    const resultPanel = document.getElementById('result-panel');
+    const iframe = document.getElementById('payment-frame');
+
+    window.addEventListener('message', async (event) => {
+      if (!event.data?.type) return;
+
+      if (event.data.type === 'PAYMENT_TOKEN') {
+        const token = event.data.token;
+        tokenPanel.textContent = `Received token: ${token}`;
+
         try {
-          const response = await fetch(PAY_API_URL, {
+          const res = await fetch('http://localhost:3000/api/v1/pay', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              token: token,
-              amount: 1000,
-              postalCode: '90210' 
+              token,
+              amount: 100,
             })
           });
 
-          const result = await response.json();
-          responseOutputDiv.textContent = JSON.stringify(result, null, 2);
+          const data = await res.json();
 
-          if (response.ok && result.success) {
-            statusDiv.className = 'success';
-            statusDiv.textContent = `Payment Successful! Transaction ID: ${result.transactionId}`;
+          if (res.ok && data.success) {
+            resultPanel.innerHTML = `
+              <div class="panel success">
+                Payment successful<br />
+                Transaction ID: <strong>${data.transactionId}</strong>
+              </div>
+            `;
           } else {
-            statusDiv.className = 'failure';
-            statusDiv.textContent = `Payment Failed: ${result.message || 'Transaction not completed'}`;
+            throw data;
           }
-
-        } catch (error) {
-          statusDiv.className = 'failure';
-          statusDiv.textContent = `Payment Request Failed (Network Error): ${error.message}`;
-          responseOutputDiv.textContent = `Error: ${error.message}`;
-          console.error('Payment API Call Failed:', error);
+        } catch (err) {
+          resultPanel.innerHTML = `
+            <div class="panel error">
+              Payment failed<br />
+              ${err.message || 'Unknown error'}
+            </div>
+          `;
         }
       }
 
-      console.log("Host application initialized and listening for iFrame messages.");
+      // optional: validation error from component
+      if (event.data.type === 'PAYMENT_ERROR') {
+        resultPanel.innerHTML = `
+          <div class="panel error">
+            ${event.data.message}
+          </div>
+        `;
+      }
+    });
 
-    </script>
+  </script>
 
-  </body>
+</body>
 </html>

@@ -9,23 +9,12 @@ import { TokenService } from '../services/token.service';
   standalone: true,
   templateUrl: './payment-element.component.html',
   styleUrl: './payment-element.component.scss',
-  // Using Emulated is fine; ShadowDom is better if you want absolute style isolation
-  encapsulation: ViewEncapsulation.Emulated 
 })
 export class PaymentElementComponent implements OnInit {
 
-  // Replaces window.parent.postMessage
   @Output() paymentToken = new EventEmitter<string>();
   
-  // Replaces window.parent.postMessage for errors
   @Output() validationError = new EventEmitter<string>();
-
-  // Replaces window.addEventListener('message')
-  @Input() set variables(theme: Record<string, string>) {
-    if (theme) {
-      this.applyTheme(theme);
-    }
-  }
 
   paymentForm!: FormGroup;
 
@@ -33,14 +22,6 @@ export class PaymentElementComponent implements OnInit {
 
   ngOnInit() {
     this.initForm();
-  }
-
-  private applyTheme(theme: Record<string, string>) {
-    // We apply variables to documentElement so they are available to :host
-    const root = document.documentElement;
-    Object.entries(theme).forEach(([key, value]) => {
-      root.style.setProperty(key, value);
-    });
   }
 
   private initForm() {
@@ -51,7 +32,6 @@ export class PaymentElementComponent implements OnInit {
       postalCode: ['', [Validators.required, Validators.minLength(5)]]
     });
 
-    // --- Formatting Logic ---
     this.paymentForm.get('cardNumber')?.valueChanges.subscribe(val => {
       if (val) {
         const digitsOnly = val.replace(/\D/g, '');
@@ -72,17 +52,25 @@ export class PaymentElementComponent implements OnInit {
       }
     });
 
-    // Apply numeric filters to Security and Postal codes
-    ['securityCode', 'postalCode'].forEach(controlName => {
-      this.paymentForm.get(controlName)?.valueChanges.subscribe(val => {
-        if (val) {
-          const digitOnly = val.replace(/\D/g, '');
-          if (digitOnly !== val) {
-            this.paymentForm.get(controlName)?.setValue(digitOnly, { emitEvent: false });
-          }
-        }      
-      });
-    });
+    this.paymentForm.get('securityCode')?.valueChanges.subscribe(val => {
+      if (val) {
+        const digitOnly = val.replace(/\D/g, '');
+        if (digitOnly !== val) {
+          this.paymentForm.get('securityCode')?.setValue(digitOnly, { emitEvent: false });
+        }
+      }
+    })
+
+    this.paymentForm.get('postalCode')?.valueChanges.subscribe(val => {
+      if (val) {
+        const digitOnly = val.replace(/\D/g, '');
+        if (digitOnly !== val) {
+          this.paymentForm.get('postalCode')?.setValue(digitOnly, { emitEvent: false });
+        }
+      }
+    })
+
+
   }
 
   expirationDateValidator(): ValidatorFn {
@@ -118,11 +106,9 @@ export class PaymentElementComponent implements OnInit {
 
     this.tokenService.getToken(normalizedCardData).subscribe({
       next: (res) => {
-        // Emit standard Angular event
         this.paymentToken.emit(res.token);
       },
       error: (err) => {
-        // Emit error event
         this.validationError.emit(err.error?.message || 'Tokenization failed');
       }
     });

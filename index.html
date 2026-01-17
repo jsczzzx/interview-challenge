@@ -9,11 +9,9 @@
 
   <payment-element></payment-element>
 
-  <!-- Bridge: Angular Element → iframe → host -->
   <script type="module">
     const el = document.querySelector('payment-element');
 
-    // Forward Angular @Output → postMessage
     el.addEventListener('paymentToken', (e) => {
       window.parent.postMessage({
         type: 'PAYMENT_TOKEN',
@@ -28,7 +26,6 @@
       }, '*');
     });
 
-    // Receive theme from host
     window.addEventListener('message', (event) => {
       if (event.data?.type === 'SET_THEME') {
         const vars = event.data.variables || {};
@@ -40,8 +37,8 @@
   </script>
 
   <!-- Angular runtime (must be module as you said) -->
-  <script src="polyfills.js" type="module"></script>
-  <script src="main.js" type="module"></script>
+  <script src="./payment-element/dist/payment-element/browser/polyfills.js" type="module"></script>
+  <script src="./payment-element/dist/payment-element/browser/main.js" type="module"></script>
 
 </body>
 </html>
