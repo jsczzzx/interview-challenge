@@ -88,6 +88,6 @@
             }  
         </div>
     </div>    
-    <button class="btn-primary" [disabled]="!paymentForm.valid">Place Your Order</button>
+    <button class="btn-primary" type="button" (click)="submit()" [disabled]="!paymentForm.valid">Place Your Order</button>
 
 </form>

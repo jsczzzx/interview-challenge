@@ -11,13 +11,8 @@ import { PaymentElementComponent } from "./payment-element/payment-element.compo
 export class AppComponent {
   title = 'payment-element';
 
-  ngOnInit() {
-        window.addEventListener('message', (event) => {
-      const data = event.data;
-      if (data?.type === 'setTheme' && data.variables) {
-        for (const [k, v] of Object.entries(data.variables)) {
-          document.documentElement.style.setProperty(k, v as string);
-        }
-    }})
-  }
+ngOnInit() {
+
+}
+
 }

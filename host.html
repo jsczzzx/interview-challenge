@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout Page (Host)</title>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 24px;
+      background: #f9fafb;
+    }
+
+    iframe {
+      width: 100%;
+      max-width: 720px;
+      height: 560px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      max-width: 720px;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .panel.token {
+      background: #020617;
+      color: #e5e7eb;
+    }
+
+    .panel.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+
+    .panel.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Checkout Page (Host)</h1>
+
+  <iframe
+    id="payment-frame"
+    src="http://localhost:8080/index.html"
+    sandbox="allow-scripts allow-same-origin"
+  ></iframe>
+
+  <div id="token-panel" class="panel token">
+    Waiting for token…
+  </div>
+
+  <div id="result-panel"></div>
+
+  <script>
+    const tokenPanel = document.getElementById('token-panel');
+    const resultPanel = document.getElementById('result-panel');
+    const iframe = document.getElementById('payment-frame');
+
+    window.addEventListener('message', async (event) => {
+      if (!event.data?.type) return;
+
+      // 1️⃣ token received
+      if (event.data.type === 'PAYMENT_TOKEN') {
+        const token = event.data.token;
+        tokenPanel.textContent = `Received token: ${token}`;
+
+        // 2️⃣ call payment API
+        try {
+          const res = await fetch('http://localhost:3000/api/v1/pay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              token,
+              amount: 1999,
+              postalCode: '10001'
+            })
+          });
+
+          const data = await res.json();
+
+          // 3️⃣ render result
+          if (res.ok && data.success) {
+            resultPanel.innerHTML = `
+              <div class="panel success">
+                ✅ Payment successful<br />
+                Transaction ID: <strong>${data.transactionId}</strong>
+              </div>
+            `;
+          } else {
+            throw data;
+          }
+        } catch (err) {
+          resultPanel.innerHTML = `
+            <div class="panel error">
+              ❌ Payment failed<br />
+              ${err.message || 'Unknown error'}
+            </div>
+          `;
+        }
+      }
+
+      // optional: validation error from component
+      if (event.data.type === 'PAYMENT_ERROR') {
+        resultPanel.innerHTML = `
+          <div class="panel error">
+            ❌ ${event.data.message}
+          </div>
+        `;
+      }
+    });
+
+    // send theme
+    iframe.onload = () => {
+      iframe.contentWindow.postMessage({
+        type: 'SET_THEME',
+        variables: {
+          '--pe-color-bg': '#020617',
+          '--pe-color-text': '#e5e7eb',
+          '--pe-color-border': '#1e293b',
+          '--pe-color-primary': '#2563eb'
+        }
+      }, '*');
+    };
+  </script>
+
+</body>
+</html>

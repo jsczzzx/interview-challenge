@@ -1,22 +1,13 @@
-// :host {
-//   --pe-color-primary: blue;
-//   --pe-color-border: #d1d5db;
-//   --pe-color-bg: white;
-//   --pe-color-text: black;
-//   --pe-color-focus: #4f46e5;
-//   --pe-color-error: red;
-  
-//   --pe-radius: 6px;
-
-//   --pe-font-family: system-ui, -apple-system, BlinkMacSystemFont;
-//   --pe-font-size: 16px;
-// }
-
 :host,
 :host * {
-  font-family: var(--pe-font-family);
-  font-size: var(--pe-font-size);
-  color: var(--pe-color-text);
+  font-family: var(
+    --pe-font-family,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont
+  );
+  font-size: var(--pe-font-size, 16px);
+  color: var(--pe-color-text, black);
   box-sizing: border-box;
 }
 
@@ -25,22 +16,27 @@ form {
   flex-direction: column;
   gap: 10px;
   max-width: 600px;
-  background-color: var(--pe-color-bg);
-  border: 1px solid var(--pe-color-border);
-  border-radius: var(--pe-radius);
+  background-color: var(--pe-color-bg, white);
+  border: 1px solid var(--pe-color-border, #d1d5db);
+  border-radius: var(--pe-radius, 6px);
   padding: 20px;
 }
 
 input {
   padding: 12px 14px;
-  background-color: var(--pe-color-bg);
-  border: 1px solid var(--pe-color-border);
-  border-radius: var(--pe-radius);
+  background-color: var(--pe-color-bg, white);
+  border: 1px solid var(--pe-color-border, #d1d5db);
+  border-radius: var(--pe-radius, 6px);
 
   &:focus {
-    border-color: var(--pe-color-focus);
+    border-color: var(--pe-color-focus, #4f46e5);
     outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pe-color-focus) 20%, transparent);
+    box-shadow: 0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--pe-color-focus, #4f46e5) 20%,
+        transparent
+      );
   }
 }
 
@@ -57,21 +53,25 @@ input {
 }
 
 .alert {
-  color: var(--pe-color-error);
+  color: var(--pe-color-error, red);
   font-size: 13px;
 }
 
 .btn-primary {
   width: 100%;
   height: 44px;
-  background-color: var(--pe-color-primary);
+  background-color: var(--pe-color-primary, blue);
   color: #ffffff;
   border: none;
-  border-radius: var(--pe-radius);
+  border-radius: var(--pe-radius, 6px);
 }
 
 .btn-primary:hover {
-  background-color: color-mix(in srgb, var(--pe-color-primary) 85%, black);
+  background-color: color-mix(
+    in srgb,
+    var(--pe-color-primary, blue) 85%,
+    black
+  );
 }
 
 .btn-primary:disabled {

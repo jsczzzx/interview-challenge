@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Payment Element</title>
+</head>
+
+<body>
+
+  <payment-element></payment-element>
+
+  <!-- Bridge: Angular Element → iframe → host -->
+  <script type="module">
+    const el = document.querySelector('payment-element');
+
+    // Forward Angular @Output → postMessage
+    el.addEventListener('paymentToken', (e) => {
+      window.parent.postMessage({
+        type: 'PAYMENT_TOKEN',
+        token: e.detail
+      }, '*');
+    });
+
+    el.addEventListener('validationError', (e) => {
+      window.parent.postMessage({
+        type: 'PAYMENT_ERROR',
+        message: e.detail
+      }, '*');
+    });
+
+    // Receive theme from host
+    window.addEventListener('message', (event) => {
+      if (event.data?.type === 'SET_THEME') {
+        const vars = event.data.variables || {};
+        Object.entries(vars).forEach(([k, v]) => {
+          document.documentElement.style.setProperty(k, v);
+        });
+      }
+    });
+  </script>
+
+  <!-- Angular runtime (must be module as you said) -->
+  <script src="polyfills.js" type="module"></script>
+  <script src="main.js" type="module"></script>
+
+</body>
+</html>
