@@ -1,4 +1,4 @@
-<form [formGroup]="paymentForm" (ngSubmit)="submit()">
+<form [formGroup]="paymentForm">
     <h2>Card</h2>
     <div class="form-row">
         <div class="form-group">
@@ -88,6 +88,6 @@
             }  
         </div>
     </div>    
-    <button class="btn-primary" type="button" (click)="submit()" [disabled]="!paymentForm.valid">Place Your Order</button>
+    <!-- <button class="btn-primary" type="button" (click)="submit()" [disabled]="!paymentForm.valid">Place Your Order</button> -->
 
 </form>

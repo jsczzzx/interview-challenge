@@ -3,19 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <title>Payment Element</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
 <body>
 
   <payment-element></payment-element>
 
-  <script type="module">
+  <!-- Angular runtime -->
+  <script src="./payment-element/dist/payment-element/browser/polyfills.js" type="module"></script>
+  <script src="./payment-element/dist/payment-element/browser/main.js" type="module"></script>
+
+  <script>
     const el = document.querySelector('payment-element');
 
-    el.addEventListener('paymentToken', (e) => {
+    /* ---------- element → host ---------- */
+
+    el.addEventListener('statusChange', (e) => {
       window.parent.postMessage({
-        type: 'PAYMENT_TOKEN',
-        token: e.detail
+        type: 'PAYMENT_STATUS',
+        status: e.detail
+      }, '*');
+    });
+
+    el.addEventListener('paymentData', (e) => {
+      window.parent.postMessage({
+        type: 'PAYMENT_DATA',
+        payload: e.detail
       }, '*');
     });
 
@@ -26,19 +40,23 @@
       }, '*');
     });
 
+    /* ---------- host → element ---------- */
+
     window.addEventListener('message', (event) => {
-      if (event.data?.type === 'SET_THEME') {
-        const vars = event.data.variables || {};
-        Object.entries(vars).forEach(([k, v]) => {
+      if (!event.data?.type) return;
+
+      if (event.data.type === 'REQUEST_SUBMIT') {
+        // 关键修复点：不再调用 el.submit()
+        el.dispatchEvent(new CustomEvent('requestSubmit'));
+      }
+
+      if (event.data.type === 'SET_THEME') {
+        Object.entries(event.data.variables || {}).forEach(([k, v]) => {
           document.documentElement.style.setProperty(k, v);
         });
       }
     });
   </script>
-
-  <!-- Angular runtime (must be module as you said) -->
-  <script src="./payment-element/dist/payment-element/browser/polyfills.js" type="module"></script>
-  <script src="./payment-element/dist/payment-element/browser/main.js" type="module"></script>
 
 </body>
 </html>

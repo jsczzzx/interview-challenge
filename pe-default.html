@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Checkout Page (Default)</title>
+  <title>Checkout (Default)</title>
 
   <style>
     body {
@@ -13,37 +13,44 @@
 
     iframe {
       width: 100%;
-      max-width: 720px;
-      height: 560px;
+      max-width: 600px;
+      height: 340px;
       border: 1px solid #e5e7eb;
       border-radius: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 14px 18px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
     }
 
     .panel {
-      max-width: 720px;
-      padding: 16px;
+      margin-top: 16px;
+      padding: 12px;
       border-radius: 8px;
-      margin-bottom: 16px;
       font-size: 14px;
     }
 
-    .panel.success {
-      background: #ecfdf5;
-      color: #065f46;
-      border: 1px solid #10b981;
-    }
-
-    .panel.error {
-      background: #fef2f2;
-      color: #991b1b;
-      border: 1px solid #ef4444;
-    }
+    .success { background: #ecfdf5; color: #065f46; }
+    .error   { background: #fef2f2; color: #991b1b; }
+    .info    { background: #ffffff; }
   </style>
 </head>
+
 <body>
 
-  <h1>Checkout Page (Default)</h1>
+  <h1>Checkout (Default)</h1>
 
   <iframe
     id="payment-frame"
@@ -51,65 +58,75 @@
     sandbox="allow-scripts allow-same-origin"
   ></iframe>
 
-  <div id="token-panel">
-    Waiting for token…
+  <div>
+    <button id="place-order" disabled>
+      Place Order
+    </button>
   </div>
 
-  <div id="result-panel"></div>
+
+  <div id="status" class="panel info">
+    Waiting for payment details…
+  </div>
 
   <script>
-    const tokenPanel = document.getElementById('token-panel');
-    const resultPanel = document.getElementById('result-panel');
     const iframe = document.getElementById('payment-frame');
+    const button = document.getElementById('place-order');
+    const statusPanel = document.getElementById('status');
+
+    let paymentStatus = 'INVALID';
 
     window.addEventListener('message', async (event) => {
-      if (!event.data?.type) return;
+      const data = event.data;
+      if (!data?.type) return;
 
-      if (event.data.type === 'PAYMENT_TOKEN') {
-        const token = event.data.token;
-        tokenPanel.textContent = `Received token: ${token}`;
+      if (data.type === 'PAYMENT_STATUS') {
+        paymentStatus = data.status;
+        button.disabled = paymentStatus !== 'VALID';
+      }
+
+      if (data.type === 'PAYMENT_DATA') {
+        statusPanel.className = 'panel info';
+        statusPanel.textContent = 'Processing payment…';
 
         try {
           const res = await fetch('http://localhost:3000/api/v1/pay', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              token,
-              amount: 100,
+              ...data.payload,
+              amount: 1999
             })
           });
 
-          const data = await res.json();
+          const result = await res.json();
 
-          if (res.ok && data.success) {
-            resultPanel.innerHTML = `
-              <div class="panel success">
-                Payment successful<br />
-                Transaction ID: <strong>${data.transactionId}</strong>
-              </div>
-            `;
+          if (res.ok && result.success) {
+            statusPanel.className = 'panel success';
+            statusPanel.textContent =
+              `Payment successful — Transaction ${result.transactionId}`;
           } else {
-            throw data;
+            throw result;
           }
         } catch (err) {
-          resultPanel.innerHTML = `
-            <div class="panel error">
-              Payment failed<br />
-              ${err.message || 'Unknown error'}
-            </div>
-          `;
+          statusPanel.className = 'panel error';
+          statusPanel.textContent =
+            err.message || 'Payment failed';
         }
       }
 
-      // optional: validation error from component
-      if (event.data.type === 'PAYMENT_ERROR') {
-        resultPanel.innerHTML = `
-          <div class="panel error">
-            ${event.data.message}
-          </div>
-        `;
+      if (data.type === 'PAYMENT_ERROR') {
+        statusPanel.className = 'panel error';
+        statusPanel.textContent = data.message;
       }
     });
+
+    button.onclick = () => {
+      iframe.contentWindow.postMessage(
+        { type: 'REQUEST_SUBMIT' },
+        '*'
+      );
+    };
 
   </script>
 
