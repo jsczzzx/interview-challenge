@@ -26,18 +26,43 @@
       }, '*');
     });
 
-    el.addEventListener('paymentData', (e) => {
-      window.parent.postMessage({
-        type: 'PAYMENT_DATA',
-        payload: e.detail
-      }, '*');
-    });
-
     el.addEventListener('validationError', (e) => {
       window.parent.postMessage({
         type: 'PAYMENT_ERROR',
         message: e.detail
       }, '*');
+    });
+
+    el.addEventListener('paymentData', async (e) => {
+      window.parent.postMessage({
+        type: 'PAYMENT_PROCESSING'
+      }, '*');
+
+      try {
+        const res = await fetch('http://localhost:3000/api/v1/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...e.detail,
+            amount: 1999
+          })
+        });
+
+        const result = await res.json();
+
+        window.parent.postMessage({
+          type: 'PAYMENT_RESULT',
+          success: res.ok && result.success,
+          result
+        }, '*');
+
+      } catch (err) {
+        window.parent.postMessage({
+          type: 'PAYMENT_RESULT',
+          success: false,
+          result: { message: 'Network error' }
+        }, '*');
+      }
     });
 
     /* ---------- host → element ---------- */

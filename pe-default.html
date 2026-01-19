@@ -69,66 +69,50 @@
     Waiting for payment details…
   </div>
 
-  <script>
-    const iframe = document.getElementById('payment-frame');
-    const button = document.getElementById('place-order');
-    const statusPanel = document.getElementById('status');
+<script>
+  const iframe = document.getElementById('payment-frame');
+  const button = document.getElementById('place-order');
+  const statusPanel = document.getElementById('status');
 
-    let paymentStatus = 'INVALID';
+  let paymentStatus = 'INVALID';
 
-    window.addEventListener('message', async (event) => {
-      const data = event.data;
-      if (!data?.type) return;
+  window.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data?.type) return;
 
-      if (data.type === 'PAYMENT_STATUS') {
-        paymentStatus = data.status;
-        button.disabled = paymentStatus !== 'VALID';
-      }
+    if (data.type === 'PAYMENT_STATUS') {
+      paymentStatus = data.status;
+      button.disabled = paymentStatus !== 'VALID';
+    }
 
-      if (data.type === 'PAYMENT_DATA') {
-        statusPanel.className = 'panel info';
-        statusPanel.textContent = 'Processing payment…';
-
-        try {
-          const res = await fetch('http://localhost:3000/api/v1/pay', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...data.payload,
-              amount: 1999
-            })
-          });
-
-          const result = await res.json();
-
-          if (res.ok && result.success) {
-            statusPanel.className = 'panel success';
-            statusPanel.textContent =
-              `Payment successful — Transaction ${result.transactionId}`;
-          } else {
-            throw result;
-          }
-        } catch (err) {
-          statusPanel.className = 'panel error';
-          statusPanel.textContent =
-            err.message || 'Payment failed';
-        }
-      }
-
-      if (data.type === 'PAYMENT_ERROR') {
+    if (data.type === 'PAYMENT_RESULT') {
+      if (data.success) {
+        statusPanel.className = 'panel success';
+        statusPanel.textContent =
+          `Payment successful — Transaction ${data.result.transactionId}`;
+      } else {
         statusPanel.className = 'panel error';
-        statusPanel.textContent = data.message;
+        statusPanel.textContent =
+          data.result.message || 'Payment failed';
       }
-    });
+    }
 
-    button.onclick = () => {
-      iframe.contentWindow.postMessage(
-        { type: 'REQUEST_SUBMIT' },
-        '*'
-      );
-    };
+    if (data.type === 'PAYMENT_ERROR') {
+      statusPanel.className = 'panel error';
+      statusPanel.textContent = data.message;
+    }
+  });
 
-  </script>
+  button.onclick = () => {
+    iframe.contentWindow.postMessage(
+      { type: 'REQUEST_SUBMIT' },
+      '*'
+    );
+  };
+
+
+</script>
+
 
 </body>
 </html>

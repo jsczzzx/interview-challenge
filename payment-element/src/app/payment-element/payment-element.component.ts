@@ -34,7 +34,7 @@ export class PaymentElementComponent implements OnInit {
   }
 
 
-  private initForm() {
+  initForm() {
     this.paymentForm = this.fb.group({
       cardNumber: ['', [Validators.required, Validators.minLength(19)]],
       expirationDate: [
