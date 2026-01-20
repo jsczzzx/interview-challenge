@@ -1,93 +1,119 @@
 <form [formGroup]="paymentForm">
-    <h2>Card</h2>
-    <div class="form-row">
-        <div class="form-group">
-            <label for="card-number">Card number</label>
-            <input 
-                id="card-number" 
-                formControlName="cardNumber" 
-                placeholder="1234 1234 1234 1234"
-                maxlength="19"
-                [style.border-color]="(paymentForm.get('cardNumber')?.touched && !paymentForm.get('cardNumber')?.valid) ? 'red' : null "
-            >
-            @if (paymentForm.get("cardNumber")?.touched) {
-                @if (paymentForm.get("cardNumber")?.hasError("required")) {
-                    <small class="alert">Card number is required!</small>
-                }
-                @if (paymentForm.get("cardNumber")?.hasError("minlength")) {
-                    <small class="alert">Card number is incomplete!</small>
-                }
-            }
-        </div>
+  <h2>Card</h2>
+
+  <!-- Card Number -->
+  <div class="form-row">
+    <div class="form-group">
+      <label for="card-number">Card number</label>
+      <input
+        id="card-number"
+        formControlName="cardNumber"
+        placeholder="1234 1234 1234 1234"
+        maxlength="19"
+        [attr.aria-invalid]="paymentForm.get('cardNumber')?.touched && paymentForm.get('cardNumber')?.invalid"
+        [attr.aria-describedby]="paymentForm.get('cardNumber')?.invalid ? 'card-number-error' : null"
+      />
+      @if (paymentForm.get("cardNumber")?.touched) {
+        <small id="card-number-error" class="alert">
+          @if (paymentForm.get("cardNumber")?.hasError("required")) {
+            Card number is required!
+          }
+          @if (paymentForm.get("cardNumber")?.hasError("minlength")) {
+            Card number is incomplete!
+          }
+        </small>
+      }
     </div>
-    <div class="form-row">
-        <div class="form-group">
-            <label for="expiration-date">Expiration date</label>
-            <input 
-                id="expiration-date" 
-                formControlName="expirationDate" 
-                type="text"
-                maxlength="7"
-                placeholder="MM / YY"
-                [style.border-color]="(paymentForm.get('expirationDate')?.touched && !paymentForm.get('expirationDate')?.valid) ? 'red' : null "
-            >
-            @if (paymentForm.get("expirationDate")?.touched) {
-                @if (paymentForm.get("expirationDate")?.hasError("required")) {
-                    <small class="alert">Expiration date is required!</small>
-                }
-                @if (paymentForm.get("expirationDate")?.hasError("minlength")) {
-                    <small class="alert">Expiration date is incomplete!</small>
-                }
-                @if (paymentForm.get("expirationDate")?.hasError("invalidMonth")) {
-                    <small class="alert">Expiration format is invalid!</small>
-                }
-                @if (paymentForm.get("expirationDate")?.hasError("expired")) {
-                    <small class="alert">Your card is expired!</small>
-                }
-            }  
-        </div>
-        <div class="form-group">
-            <label for="security-code">Security code</label>
-            <input 
-                id="security-code" 
-                formControlName="securityCode" 
-                type="text"
-                maxlength="3"
-                placeholder="CVC"
-                [style.border-color]="(paymentForm.get('securityCode')?.touched && !paymentForm.get('securityCode')?.valid) ? 'red' : null "
-            >
-            @if (paymentForm.get("securityCode")?.touched) {
-                @if (paymentForm.get("securityCode")?.hasError("required")) {
-                    <small class="alert">Security code is required!</small>
-                }
-                @if (paymentForm.get("securityCode")?.hasError("minlength")) {
-                    <small class="alert">Security code is incomplete!</small>
-                }
-            }  
-        </div>
+  </div>
+
+  <!-- Expiration + CVC -->
+  <div class="form-row">
+    <div class="form-group">
+      <label for="expiration-date">Expiration date</label>
+      <input
+        id="expiration-date"
+        formControlName="expirationDate"
+        type="text"
+        maxlength="7"
+        placeholder="MM / YY"
+        inputmode="numeric"
+        autocomplete="cc-exp"
+        [attr.aria-invalid]="paymentForm.get('expirationDate')?.touched && paymentForm.get('expirationDate')?.invalid"
+        [attr.aria-describedby]="paymentForm.get('expirationDate')?.invalid ? 'expiration-date-error' : null"
+      />
+      @if (paymentForm.get("expirationDate")?.touched) {
+        <small id="expiration-date-error" class="alert">
+          @if (paymentForm.get("expirationDate")?.hasError("required")) {
+            Expiration date is required!
+          }
+          @if (paymentForm.get("expirationDate")?.hasError("minlength")) {
+            Expiration date is incomplete!
+          }
+          @if (paymentForm.get("expirationDate")?.hasError("invalidMonth")) {
+            Expiration format is invalid!
+          }
+          @if (paymentForm.get("expirationDate")?.hasError("expired")) {
+            Your card is expired!
+          }
+        </small>
+      }
     </div>
 
-    <div class="form-row">
-        <div class="form-group">
-            <label for="postal-code">Postal code</label>
-            <input 
-                id="postal-code" 
-                formControlName="postalCode" 
-                type="text"
-                maxlength="5"
-                placeholder="12345"
-                [style.border-color]="(paymentForm.get('postalCode')?.touched && !paymentForm.get('postalCode')?.valid) ? 'red' : null "
-            >
-            @if (paymentForm.get("postalCode")?.touched) {
-                @if (paymentForm.get("postalCode")?.hasError("required")) {
-                    <small class="alert">Postal code is required!</small>
-                }
-                @if (paymentForm.get("postalCode")?.hasError("minlength")) {
-                    <small class="alert">Postal code is incomplete!</small>
-                }
-            }  
-        </div>
-    </div>    
-    <!-- <button class="btn-primary" type="button" (click)="submit()" [disabled]="!paymentForm.valid">Place Your Order</button> -->
+    <div class="form-group">
+      <label for="security-code">Security code</label>
+      <input
+        id="security-code"
+        formControlName="securityCode"
+        type="text"
+        maxlength="3"
+        placeholder="CVC"
+        inputmode="numeric"
+        autocomplete="cc-csc"
+        [attr.aria-invalid]="paymentForm.get('securityCode')?.touched && paymentForm.get('securityCode')?.invalid"
+        [attr.aria-describedby]="paymentForm.get('securityCode')?.invalid ? 'security-code-error' : null"
+      />
+      @if (paymentForm.get("securityCode")?.touched) {
+        <small id="security-code-error" class="alert">
+          @if (paymentForm.get("securityCode")?.hasError("required")) {
+            Security code is required!
+          }
+          @if (paymentForm.get("securityCode")?.hasError("minlength")) {
+            Security code is incomplete!
+          }
+        </small>
+      }
+    </div>
+  </div>
 
+  <!-- Postal Code -->
+  <div class="form-row">
+    <div class="form-group">
+      <label for="postal-code">Postal code</label>
+      <input
+        id="postal-code"
+        formControlName="postalCode"
+        type="text"
+        maxlength="5"
+        placeholder="12345"
+        inputmode="numeric"
+        autocomplete="postal-code"
+        [attr.aria-invalid]="paymentForm.get('postalCode')?.touched && paymentForm.get('postalCode')?.invalid"
+        [attr.aria-describedby]="paymentForm.get('postalCode')?.invalid ? 'postal-code-error' : null"
+      />
+      @if (paymentForm.get("postalCode")?.touched) {
+        <small id="postal-code-error" class="alert">
+          @if (paymentForm.get("postalCode")?.hasError("required")) {
+            Postal code is required!
+          }
+          @if (paymentForm.get("postalCode")?.hasError("minlength")) {
+            Postal code is incomplete!
+          }
+        </small>
+      }
+    </div>
+  </div>
+
+  <!-- <button class="btn-primary" type="button" [disabled]="!paymentForm.valid">
+    Place Your Order
+  </button> -->
 </form>
