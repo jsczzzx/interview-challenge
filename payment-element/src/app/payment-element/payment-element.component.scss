@@ -40,7 +40,6 @@ input {
   }
 }
 
-/* ✅ a11y: error state is NOT color-only */
 input.ng-invalid.ng-touched {
   border-color: var(--pe-color-error, #dc2626);
   outline: 2px solid var(--pe-color-error, #dc2626);
