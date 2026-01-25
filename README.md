@@ -17,7 +17,7 @@ This is intentionally not built as a traditional Angular SPA. The payment UI is 
 ```
 .
 ├── json-server/          # Mock backend (tokenize + pay)
-├── payment-element/      # Angular app (iframe content)
+├── payment-element/      # Angular element (iframe content)
 ├── pe-default.html       # Host demo page (default theme)
 ├── pe-dark.html          # Host demo page (dark theme)
 └── README.md
