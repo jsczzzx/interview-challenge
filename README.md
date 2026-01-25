@@ -173,19 +173,6 @@ http://localhost:8080/pe-dark.html
 
 Note: Using `file://` will break iframe isolation and `postMessage` behavior.
 
----
-
-## Why iframe (and not Web Components)
-
-This is a deliberate design decision.
-
-iframe provides:
-- Full DOM isolation
-- No CSS leakage
-- No JS context sharing
-- Strong security boundary
-
-For payment use cases, this is closer to real-world production systems than using Shadow DOM alone.
 
 ---
 
