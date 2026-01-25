@@ -59,6 +59,8 @@ Responsibilities:
 
 This layer directly talk to the backend and isolate the payment data.
 
+---
+
 ### 3. client page (pe-default.html / pe-dark.html)
 
 Responsibilities:
