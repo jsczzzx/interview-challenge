@@ -29,48 +29,54 @@ This is intentionally not built as a traditional Angular SPA. The payment UI is 
 
 The project is split into three clearly separated parts:
 
-### 1. payment-element (Angular – iframe content)
+### 1. payment-element (Angular – Angular Element + iframe content)
 
 Responsibilities:
 - Render payment form UI
 - Handle input formatting (card number, expiry, CVC, postal code)
 - Validate user input
 - Normalize card data
-- Call `/api/v1/tokenize`
-- Send token to host via `window.parent.postMessage`
+- Send out validation status/errors and payment data
+- Generate Web Component Build
 
 Key points:
 - The Angular app never handles payment processing directly
 - It only produces a token
 - It has no knowledge of order amount or business logic
 
-This mirrors how real payment elements work: collect + tokenize only.
+This is a web component created by Angular, implementing real time validation and customization.
 
 ---
 
-### 2. Host pages (pe-default.html / pe-dark.html)
+### 2. iframe page (index.html)
 
 Responsibilities:
 - Load the payment element via iframe
-- Send theme tokens to iframe via `postMessage`
-- Receive payment token from iframe
-- Call `/api/v1/pay`
-- Display payment result
+- Isolate sensitive data
+- Receive data sent by payment element
+- Call `/api/v1/pay` to confirm payment
+- Forward data to client 
 
-The host page never sees raw card data. It only deals with tokens.
+This layer directly talk to the backend and isolate the payment data.
 
-This separation is intentional and is the core security model.
+### 3. client page (pe-default.html / pe-dark.html)
+
+Responsibilities:
+- Load the iframe element
+- Send submit order request and theme tokens to iframe via `postMessage`
+- Display payment result, handle errors
+
+The host page never sees raw card data.
+
 
 ---
 
-### 3. json-server (mock backend)
+### 4. json-server (mock backend)
 
 Endpoints:
-- `POST /api/v1/tokenize`  
-  Simulates token generation from card data
 
 - `POST /api/v1/pay`  
-  Simulates payment processing using token
+  Simulates payment processing, return random results.
 
 This backend is only for demo purposes. No real payment logic exists.
 
@@ -78,19 +84,8 @@ This backend is only for demo purposes. No real payment logic exists.
 
 ## Data Flow
 
-```
-User types card data
-        ↓
-[ Angular payment-element (iframe) ]
-        ↓  POST /api/v1/tokenize
-[ json-server ]
-        ↓  returns token
-[ Angular iframe ]
-        ↓  postMessage(token)
-[ Host page ]
-        ↓  POST /api/v1/pay
-[ json-server ]
-```
+<img width="1982" height="1132" alt="ScreenShot_2026-01-25_033823_314" src="https://github.com/user-attachments/assets/81091b2c-1f0d-435a-96a0-b987db9f8228" />
+
 
 At no point does raw card data leave the iframe context.
 
@@ -112,14 +107,12 @@ paymentFrame.contentWindow.postMessage({
 }, '*');
 ```
 
-Inside Angular, styles are defined using these tokens:
+Inside iframe element, styles are defined using these tokens:
 
-```scss
-form {
-  background-color: var(--pe-color-bg);
-  color: var(--pe-color-text);
-  border: 1px solid var(--pe-color-border);
-}
+```js
+Object.entries(event.data.variables || {}).forEach(([k, v]) => {
+  document.documentElement.style.setProperty(k, v);
+});
 ```
 
 This allows:
@@ -147,19 +140,15 @@ http://localhost:3000
 
 ---
 
-### 2. Start Angular payment element
+### 2. Build Angular payment element
 
 ```bash
 cd payment-element
 npm install
-npm start
+ng build
 ```
 
-Angular app will run on:
-
-```
-http://localhost:4200
-```
+Build files main.js and polyfills.js will be generated in /dist:
 
 ---
 
@@ -198,15 +187,3 @@ For payment use cases, this is closer to real-world production systems than usin
 
 ---
 
-## Notes
-
-- This project focuses on architecture and data flow, not visual design
-- The backend is mocked
-- No real payment provider is used
-- The goal is to demonstrate correct separation of concerns and security boundaries
-
----
-
-## License
-
-For demonstration and evaluation purposes only.
