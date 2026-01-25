@@ -1,6 +1,6 @@
 # Secure Payment Element (Angular + iframe)
 
-This project demonstrates a secure payment element architecture using **Angular inside an iframe**, a **mock backend (json-server)**, and **design-token based theming via postMessage**.
+This project demonstrates a secure payment element architecture using **Angular Element** inside an **iframe**, a **mock backend (json-server)**, and **design-token based theming via postMessage**.
 
 The goal is to simulate how modern payment systems (e.g. Stripe Elements, Adyen Drop-in) isolate sensitive card data while still allowing host applications to control styling and handle payment flow.
 
@@ -39,12 +39,8 @@ Responsibilities:
 - Send out validation status/errors and payment data
 - Generate Web Component Build
 
-Key points:
-- The Angular app never handles payment processing directly
-- It only produces a token
-- It has no knowledge of order amount or business logic
+The Angular element can implement real time validation and customization, it never handles payment processing directly.
 
-This is a web component created by Angular, implementing real time validation and customization.
 
 ---
 
