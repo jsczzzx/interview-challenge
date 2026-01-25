@@ -82,7 +82,7 @@ This backend is only for demo purposes. No real payment logic exists.
 
 ## Data Flow
 
-<img width="1982" height="1132" alt="ScreenShot_2026-01-25_033823_314" src="https://github.com/user-attachments/assets/81091b2c-1f0d-435a-96a0-b987db9f8228" />
+<img width="1856" height="992" alt="image" src="https://github.com/user-attachments/assets/442cda3f-887a-4337-b748-d366763d7a97" />
 
 
 At no point does raw card data leave the iframe context.
