@@ -1,15 +1,13 @@
 # Secure Payment Element (Angular + iframe)
 
-This project demonstrates a secure payment element architecture using **Angular inside an iframe**, a **mock backend (json-server)**, and **design-token based theming via postMessage**.
+This project demonstrates a secure payment element architecture using **Angular Element** inside an **iframe**, a **mock backend (json-server)**, and **design-token based theming via postMessage**.
 
 The goal is to simulate how modern payment systems (e.g. Stripe Elements, Adyen Drop-in) isolate sensitive card data while still allowing host applications to control styling and handle payment flow.
 
 This is intentionally not built as a traditional Angular SPA. The payment UI is treated as an isolated, embeddable component.
 
-<img width="1430" height="1288" alt="ScreenShot_2026-01-06_161130_687" src="https://github.com/user-attachments/assets/6f68a34c-abc1-4e99-9056-9bfbf5a80e99" />
-<img width="1192" height="784" alt="ScreenShot_2026-01-06_161234_329" src="https://github.com/user-attachments/assets/81af9ce2-1864-4cef-90d8-fc2d4250c515" />
-<img width="1524" height="1582" alt="ScreenShot_2026-01-06_161308_371" src="https://github.com/user-attachments/assets/2192ca29-62ba-42f4-857c-32f36a19b0da" />
-<img width="1506" height="1584" alt="ScreenShot_2026-01-06_161321_251" src="https://github.com/user-attachments/assets/09449459-a858-4da0-a940-6eb52ca6f472" />
+<img width="1140" height="1096" alt="image" src="https://github.com/user-attachments/assets/bd46d835-88aa-42c2-b589-d1b9e18ea52f" />
+<img width="1132" height="1120" alt="image" src="https://github.com/user-attachments/assets/e22d3495-331c-402c-89e2-022511cda497" />
 
 
 ---
@@ -19,7 +17,7 @@ This is intentionally not built as a traditional Angular SPA. The payment UI is 
 ```
 .
 ├── json-server/          # Mock backend (tokenize + pay)
-├── payment-element/      # Angular app (iframe content)
+├── payment-element/      # Angular element (iframe content)
 ├── pe-default.html       # Host demo page (default theme)
 ├── pe-dark.html          # Host demo page (dark theme)
 └── README.md
@@ -31,48 +29,52 @@ This is intentionally not built as a traditional Angular SPA. The payment UI is 
 
 The project is split into three clearly separated parts:
 
-### 1. payment-element (Angular – iframe content)
+### 1. payment-element (Angular – Angular Element + iframe content)
 
 Responsibilities:
 - Render payment form UI
 - Handle input formatting (card number, expiry, CVC, postal code)
 - Validate user input
 - Normalize card data
-- Call `/api/v1/tokenize`
-- Send token to host via `window.parent.postMessage`
+- Send out validation status/errors and payment data
+- Generate Web Component Build
 
-Key points:
-- The Angular app never handles payment processing directly
-- It only produces a token
-- It has no knowledge of order amount or business logic
+The Angular element can implement real time validation and customization, it never handles payment processing directly.
 
-This mirrors how real payment elements work: collect + tokenize only.
 
 ---
 
-### 2. Host pages (pe-default.html / pe-dark.html)
+### 2. iframe page (index.html)
 
 Responsibilities:
 - Load the payment element via iframe
-- Send theme tokens to iframe via `postMessage`
-- Receive payment token from iframe
-- Call `/api/v1/pay`
-- Display payment result
+- Isolate sensitive data
+- Receive data sent by payment element
+- Call `/api/v1/pay` to confirm payment
+- Forward data to client 
 
-The host page never sees raw card data. It only deals with tokens.
-
-This separation is intentional and is the core security model.
+This layer directly talk to the backend and isolate the payment data.
 
 ---
 
-### 3. json-server (mock backend)
+### 3. client page (pe-default.html / pe-dark.html)
+
+Responsibilities:
+- Load the iframe element
+- Send submit order request and theme tokens to iframe via `postMessage`
+- Display payment result, handle errors
+
+The host page never sees raw card data.
+
+
+---
+
+### 4. json-server (mock backend)
 
 Endpoints:
-- `POST /api/v1/tokenize`  
-  Simulates token generation from card data
 
 - `POST /api/v1/pay`  
-  Simulates payment processing using token
+  Simulates payment processing, return random results.
 
 This backend is only for demo purposes. No real payment logic exists.
 
@@ -80,19 +82,8 @@ This backend is only for demo purposes. No real payment logic exists.
 
 ## Data Flow
 
-```
-User types card data
-        ↓
-[ Angular payment-element (iframe) ]
-        ↓  POST /api/v1/tokenize
-[ json-server ]
-        ↓  returns token
-[ Angular iframe ]
-        ↓  postMessage(token)
-[ Host page ]
-        ↓  POST /api/v1/pay
-[ json-server ]
-```
+<img width="1856" height="992" alt="image" src="https://github.com/user-attachments/assets/442cda3f-887a-4337-b748-d366763d7a97" />
+
 
 At no point does raw card data leave the iframe context.
 
@@ -114,14 +105,12 @@ paymentFrame.contentWindow.postMessage({
 }, '*');
 ```
 
-Inside Angular, styles are defined using these tokens:
+Inside iframe element, styles are defined using these tokens:
 
-```scss
-form {
-  background-color: var(--pe-color-bg);
-  color: var(--pe-color-text);
-  border: 1px solid var(--pe-color-border);
-}
+```js
+Object.entries(event.data.variables || {}).forEach(([k, v]) => {
+  document.documentElement.style.setProperty(k, v);
+});
 ```
 
 This allows:
@@ -149,19 +138,15 @@ http://localhost:3000
 
 ---
 
-### 2. Start Angular payment element
+### 2. Build Angular payment element
 
 ```bash
 cd payment-element
 npm install
-npm start
+ng build
 ```
 
-Angular app will run on:
-
-```
-http://localhost:4200
-```
+Build files main.js and polyfills.js will be generated in /dist:
 
 ---
 
@@ -184,31 +169,6 @@ http://localhost:8080/pe-dark.html
 
 Note: Using `file://` will break iframe isolation and `postMessage` behavior.
 
----
-
-## Why iframe (and not Web Components)
-
-This is a deliberate design decision.
-
-iframe provides:
-- Full DOM isolation
-- No CSS leakage
-- No JS context sharing
-- Strong security boundary
-
-For payment use cases, this is closer to real-world production systems than using Shadow DOM alone.
 
 ---
 
-## Notes
-
-- This project focuses on architecture and data flow, not visual design
-- The backend is mocked
-- No real payment provider is used
-- The goal is to demonstrate correct separation of concerns and security boundaries
-
----
-
-## License
-
-For demonstration and evaluation purposes only.
