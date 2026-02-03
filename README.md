@@ -157,7 +157,8 @@ The host pages **must be served via HTTP**. Do **not** open them using `file://`
 From the project root:
 
 ```bash
-npx http-server .
+http-server .
+http-server . -p 4200
 ```
 
 Then open in browser:
