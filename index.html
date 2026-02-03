@@ -17,26 +17,28 @@
   <script>
     const el = document.querySelector('payment-element');
 
+    const PAYMENT_ORIGIN = 'http://localhost:8080';
+
     /* ---------- element → host ---------- */
 
     el.addEventListener('statusChange', (e) => {
       window.parent.postMessage({
         type: 'PAYMENT_STATUS',
         status: e.detail
-      }, '*');
+      }, PAYMENT_ORIGIN);
     });
 
     el.addEventListener('validationError', (e) => {
       window.parent.postMessage({
         type: 'PAYMENT_ERROR',
         message: e.detail
-      }, '*');
+      }, PAYMENT_ORIGIN);
     });
 
     el.addEventListener('paymentData', async (e) => {
       window.parent.postMessage({
         type: 'PAYMENT_PROCESSING'
-      }, '*');
+      }, PAYMENT_ORIGIN);
 
       try {
         const res = await fetch('http://localhost:3000/api/v1/pay', {
@@ -54,14 +56,14 @@
           type: 'PAYMENT_RESULT',
           success: res.ok && result.success,
           result
-        }, '*');
+        }, PAYMENT_ORIGIN);
 
       } catch (err) {
         window.parent.postMessage({
           type: 'PAYMENT_RESULT',
           success: false,
           result: { message: 'Network error' }
-        }, '*');
+        }, PAYMENT_ORIGIN);
       }
     });
 

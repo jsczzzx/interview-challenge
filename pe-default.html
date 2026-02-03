@@ -55,7 +55,6 @@
   <iframe
     id="payment-frame"
     src="http://localhost:8080/index.html"
-    sandbox="allow-scripts allow-same-origin"
   ></iframe>
 
   <div>
@@ -73,6 +72,9 @@
   const iframe = document.getElementById('payment-frame');
   const button = document.getElementById('place-order');
   const statusPanel = document.getElementById('status');
+
+  const PAYMENT_ORIGIN = 'http://localhost:8080';
+
 
   let paymentStatus = 'INVALID';
 
@@ -106,7 +108,7 @@
   button.onclick = () => {
     iframe.contentWindow.postMessage(
       { type: 'REQUEST_SUBMIT' },
-      '*'
+      PAYMENT_ORIGIN
     );
   };
 

@@ -104,6 +104,16 @@ export class PaymentElementComponent implements OnInit {
     };
   }
 
+  customValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (1===1) {
+        return null;
+      } else {
+        return {someErr: true};
+      }
+    }
+  }
+
 
   private submit() {
     if (this.paymentForm.invalid) {

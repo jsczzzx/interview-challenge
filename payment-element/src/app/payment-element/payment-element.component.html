@@ -8,6 +8,9 @@
       <input
         id="card-number"
         formControlName="cardNumber"
+        type="text"
+        inputmode="numeric"
+        autocomplete="cc-number"
         placeholder="1234 1234 1234 1234"
         maxlength="19"
         [attr.aria-invalid]="paymentForm.get('cardNumber')?.touched && paymentForm.get('cardNumber')?.invalid"
