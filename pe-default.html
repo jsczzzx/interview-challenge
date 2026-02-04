@@ -73,8 +73,8 @@
   const button = document.getElementById('place-order');
   const statusPanel = document.getElementById('status');
 
-  const PAYMENT_ORIGIN = 'http://localhost:8080';
-
+  const HOST_ORIGIN = 'http://localhost:4200'; 
+  const ELE_ORIGIN = 'http://localhost:8080';  
 
   let paymentStatus = 'INVALID';
 
@@ -108,7 +108,7 @@
   button.onclick = () => {
     iframe.contentWindow.postMessage(
       { type: 'REQUEST_SUBMIT' },
-      PAYMENT_ORIGIN
+      ELE_ORIGIN
     );
   };
 
